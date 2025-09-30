@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decay Chains</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <style>
+    /* Remove arrows in Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Remove arrows in Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+  </style>
+  
+  <style>
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .glow {
+      box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+    }
+
+    .radioactive {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .decay-chain-item {
+      transition: all 0.3s ease;
+    }
+
+    .decay-chain-item:hover {
+      transform: scale(1.02);
+      background-color: rgba(10, 158, 64, 0.15);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+  <div id="vanta-bg" class="fixed inset-0 -z-10 opacity-30"></div>
+  <div class="relative z-10 max-w-6xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <h1
+class="text-4xl font-extrabold bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text mb-2 leading-relaxed pb-1">        Decay Chains
+      </h1>
+      <p class="text-lg text-gray-300">Explore isotopes, calculate decay, and visualize decay chains</p>
+      <div class="mt-4 flex justify-center">
+        <i data-feather="activity" class="text-green-400 w-10 h-10 radioactive"></i>
+      </div>
+    </header>
+
+    <!-- Input Section -->
+    <section
+      class="bg-gray-800 rounded-xl shadow-2xl p-6 mb-8 backdrop-blur-sm bg-opacity-90 glow transition-all duration-300">
+      <div class="mb-6">
+        <label for="isotope-search" class="block text-lg font-medium text-gray-300 mb-2">Select Radioactive Isotope</label>
+        <div class="relative">
+          <input type="text" id="isotope-search"
+            class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-400 focus:border-transparent"
+            placeholder="e.g. Uranium 238 or Strontium 90">
+          <div id="suggestions"
+            class="absolute z-20 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto text-gray-100">
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label for="time-value" class="block text-lg font-medium text-gray-300 mb-2">Time Interval</label>
+          <div class="flex">
+            <input type="number" id="time-value"
+              class="flex-1 p-4 bg-gray-700 border border-gray-600 rounded-l-lg text-white focus:ring-2 focus:ring-green-400 focus:border-transparent"
+              placeholder="Enter time" min="0" step="0.01">
+            <select id="time-unit"
+              class="p-4 bg-gray-700 border border-gray-600 rounded-r-lg text-white focus:ring-2 focus:ring-green-400 focus:border-transparent">
+              <option value="seconds">seconds</option>
+              <option value="minutes">minutes</option>
+              <option value="hours">hours</option>
+              <option value="days">days</option>
+              <option value="years" selected>years</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="initial-nuclei" class="block text-lg font-medium text-gray-300 mb-2">Initial Nuclei (optional)</label>
+          <input type="number" id="initial-nuclei"
+            class="w-full p-4 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-400 focus:border-transparent"
+            placeholder="Default: 1" min="1" value="1">
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button id="calculate-btn"
+          class="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+          <i data-feather="zap" class="mr-2"></i> Calculate Decay
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 fade-in">
+          <div class="flex items-center mb-4">
+            <i data-feather="activity" class="text-green-400 mr-3"></i>
+            <h3 class="text-xl font-semibold text-green-400">Decay Probability</h3>
+          </div>
+          <div class="text-3xl font-bold text-green-300 mb-2" id="decay-probability">0%</div>
+          <p class="text-gray-400">Chance that a nucleus decays in the given time</p>
+        </div>
+
+        <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 fade-in">
+          <div class="flex items-center mb-4">
+            <i data-feather="layers" class="text-blue-400 mr-3"></i>
+            <h3 class="text-xl font-semibold text-blue-400">Remaining Nuclei</h3>
+          </div>
+          <div class="text-3xl font-bold text-blue-300 mb-2" id="remaining-nuclei">0</div>
+          <p class="text-gray-400">Expected number of nuclei remaining</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-800 rounded-xl shadow-xl p-6 backdrop-blur-sm bg-opacity-90 mb-8 border border-gray-700">
+        <div class="flex items-center mb-6">
+          <i data-feather="git-commit" class="text-purple-400 mr-3"></i>
+          <h2 class="text-2xl font-bold text-gray-200">Decay Chain</h2>
+        </div>
+        <div id="decay-chain" class="space-y-4"></div>
+      </div>
+
+      <div class="bg-gray-800 border border-yellow-600 rounded-xl p-6 fade-in">
+        <div class="flex items-center mb-4">
+          <i data-feather="info" class="text-yellow-400 mr-3"></i>
+          <h3 class="text-xl font-semibold text-yellow-400">Interpretation</h3>
+        </div>
+        <p class="text-gray-300" id="interpretation"></p>
+      </div>
+    </section>
+
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+      <p>Made with <i data-feather="heart" class="inline w-4 h-4 text-red-400"></i> for nuclear science enthusiasts</p>
+    </footer>
+  </div>
+
+<script src="index.js"></script>
+</body>
+</html>
