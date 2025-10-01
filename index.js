@@ -1,189 +1,161 @@
-// Background
 VANTA.GLOBE({
-  el: "#vanta-bg",
-  mouseControls: true,
-  touchControls: true,
-  gyroControls: false,
-  minHeight: 200.0,
-  minWidth: 200.0,
-  scale: 1.0,
-  scaleMobile: 1.0,
-  color: "#3b82f6",
-  backgroundColor: "#111827",
-  size: 0.8
-});
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: "#3b82f6",
+            backgroundColor: "#f3f4f6",
+            size: 0.8
+        });
 
-// --- Isotope Database ---
-const isotopeDatabase = {
-  // Uranium-238 series
-  "Uranium-238": { halfLife: 4.468e9, unit: "years", decayChain: ["Thorium-234"] },
-  "Thorium-234": { halfLife: 24.1, unit: "days", decayChain: ["Protactinium-234"] },
-  "Protactinium-234": { halfLife: 6.69, unit: "hours", decayChain: ["Uranium-234"] },
-  "Uranium-234": { halfLife: 2.455e5, unit: "years", decayChain: ["Thorium-230"] },
-  "Thorium-230": { halfLife: 7.538e4, unit: "years", decayChain: ["Radium-226"] },
-  "Radium-226": { halfLife: 1600, unit: "years", decayChain: ["Radon-222"] },
-  "Radon-222": { halfLife: 3.82, unit: "days", decayChain: ["Polonium-218"] },
-  "Polonium-218": { halfLife: 3.1, unit: "minutes", decayChain: ["Lead-214"] },
-  "Lead-214": { halfLife: 26.8, unit: "minutes", decayChain: ["Bismuth-214"] },
-  "Bismuth-214": { halfLife: 19.9, unit: "minutes", decayChain: ["Polonium-214"] },
-  "Polonium-214": { halfLife: 164e-6, unit: "seconds", decayChain: ["Lead-210"] },
-  "Lead-210": { halfLife: 22.3, unit: "years", decayChain: ["Bismuth-210"] },
-  "Bismuth-210": { halfLife: 5.01, unit: "days", decayChain: ["Polonium-210"] },
-  "Polonium-210": { halfLife: 138.4, unit: "days", decayChain: ["Lead-206"] },
-  "Lead-206": { halfLife: Infinity, unit: "stable", decayChain: [] },
+        const isotopeDatabase = {
+            "Uranium-238": { symbol: "U-238", halfLife: 4.468e9, mass: 238, decays: [{ type: "α", product: "Thorium-234", branchingRatio: 1.0 }] },
+            "Thorium-234": { symbol: "Th-234", halfLife: 24.1 / 365, mass: 234, decays: [{ type: "β⁻", product: "Protactinium-234", branchingRatio: 1.0 }] },
+            "Protactinium-234": { symbol: "Pa-234", halfLife: 6.69 / (365 * 24), mass: 234, decays: [{ type: "β⁻", product: "Uranium-234", branchingRatio: 1.0 }] },
+            "Uranium-234": { symbol: "U-234", halfLife: 2.455e5, mass: 234, decays: [{ type: "α", product: "Thorium-230", branchingRatio: 1.0 }] },
+            "Thorium-230": { symbol: "Th-230", halfLife: 7.538e4, mass: 230, decays: [{ type: "α", product: "Radium-226", branchingRatio: 1.0 }] },
+            "Radium-226": { symbol: "Ra-226", halfLife: 1600, mass: 226, decays: [{ type: "α", product: "Radon-222", branchingRatio: 1.0 }] },
+            "Radon-222": { symbol: "Rn-222", halfLife: 3.8235 / 365, mass: 222, decays: [{ type: "α", product: "Polonium-218", branchingRatio: 1.0 }] },
+            "Polonium-218": { symbol: "Po-218", halfLife: 3.10 / (365 * 24 * 60), mass: 218, decays: [{ type: "α", product: "Lead-214", branchingRatio: 0.9998 }, { type: "β⁻", product: "Astatine-218", branchingRatio: 0.0002 }] },
+            "Lead-214": { symbol: "Pb-214", halfLife: 26.8 / (365 * 24 * 60), mass: 214, decays: [{ type: "β⁻", product: "Bismuth-214", branchingRatio: 1.0 }] },
+            "Bismuth-214": { symbol: "Bi-214", halfLife: 19.9 / (365 * 24 * 60), mass: 214, decays: [{ type: "β⁻", product: "Polonium-214", branchingRatio: 0.9998 }, { type: "α", product: "Thallium-210", branchingRatio: 0.0002 }] },
+            "Polonium-214": { symbol: "Po-214", halfLife: 0.0001643 / (365 * 24 * 60 * 60), mass: 214, decays: [{ type: "α", product: "Lead-210", branchingRatio: 1.0 }] },
+            "Lead-210": { symbol: "Pb-210", halfLife: 22.3, mass: 210, decays: [{ type: "β⁻", product: "Bismuth-210", branchingRatio: 1.0 }] },
+            "Bismuth-210": { symbol: "Bi-210", halfLife: 5.012 / 365, mass: 210, decays: [{ type: "β⁻", product: "Polonium-210", branchingRatio: 1.0 }] },
+            "Polonium-210": { symbol: "Po-210", halfLife: 138.376 / 365, mass: 210, decays: [{ type: "α", product: "Lead-206", branchingRatio: 1.0 }] },
+            "Lead-206": { symbol: "Pb-206", halfLife: Infinity, mass: 206, decays: [] }
+        };
 
-  // Uranium-235 series
-  "Uranium-235": { halfLife: 7.04e8, unit: "years", decayChain: ["Thorium-231"] },
-  "Thorium-231": { halfLife: 25.5, unit: "hours", decayChain: ["Protactinium-231"] },
-  "Protactinium-231": { halfLife: 3.276e4, unit: "years", decayChain: ["Actinium-227"] },
-  "Actinium-227": { halfLife: 21.8, unit: "years", decayChain: ["Thorium-227"] },
-  "Thorium-227": { halfLife: 18.7, unit: "days", decayChain: ["Radium-223"] },
-  "Radium-223": { halfLife: 11.4, unit: "days", decayChain: ["Radon-219"] },
-  "Radon-219": { halfLife: 3.96, unit: "seconds", decayChain: ["Polonium-215"] },
-  "Polonium-215": { halfLife: 1.78e-3, unit: "seconds", decayChain: ["Lead-211"] },
-  "Lead-211": { halfLife: 36.1, unit: "minutes", decayChain: ["Bismuth-211"] },
-  "Bismuth-211": { halfLife: 2.14, unit: "minutes", decayChain: ["Thallium-207"] },
-  "Thallium-207": { halfLife: 4.77, unit: "minutes", decayChain: ["Lead-207"] },
-  "Lead-207": { halfLife: Infinity, unit: "stable", decayChain: [] },
+        const isotopeSearch = document.getElementById('isotope-search');
+        const suggestions = document.getElementById('suggestions');
+        const timeValue = document.getElementById('time-value');
+        const timeUnit = document.getElementById('time-unit');
+        const initialNuclei = document.getElementById('initial-nuclei');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resultsSection = document.getElementById('results-section');
+        const decayProbability = document.getElementById('decay-probability');
+        const remainingNuclei = document.getElementById('remaining-nuclei');
+        const decayChain = document.getElementById('decay-chain');
+        const interpretation = document.getElementById('interpretation');
 
-  // Thorium-232 series
-  "Thorium-232": { halfLife: 1.405e10, unit: "years", decayChain: ["Radium-228"] },
-  "Radium-228": { halfLife: 5.75, unit: "years", decayChain: ["Actinium-228"] },
-  "Actinium-228": { halfLife: 6.15, unit: "hours", decayChain: ["Thorium-228"] },
-  "Thorium-228": { halfLife: 1.91, unit: "years", decayChain: ["Radium-224"] },
-  "Radium-224": { halfLife: 3.66, unit: "days", decayChain: ["Radon-220"] },
-  "Radon-220": { halfLife: 55.6, unit: "seconds", decayChain: ["Polonium-216"] },
-  "Polonium-216": { halfLife: 0.145, unit: "seconds", decayChain: ["Lead-212"] },
-  "Lead-212": { halfLife: 10.6, unit: "hours", decayChain: ["Bismuth-212"] },
-  "Bismuth-212": { halfLife: 60.6, unit: "minutes", decayChain: ["Polonium-212", "Thallium-208"] },
-  "Polonium-212": { halfLife: 0.3e-6, unit: "seconds", decayChain: ["Lead-208"] },
-  "Thallium-208": { halfLife: 3.05, unit: "minutes", decayChain: ["Lead-208"] },
-  "Lead-208": { halfLife: Infinity, unit: "stable", decayChain: [] },
+        isotopeSearch.addEventListener('input', showSuggestions);
+        isotopeSearch.addEventListener('focus', showSuggestions);
+        document.addEventListener('click', (e) => { if (e.target !== isotopeSearch && e.target !== suggestions) suggestions.classList.add('hidden'); });
+        calculateBtn.addEventListener('click', calculateDecay);
 
-  // Other isotopes (sample)
-  "Carbon-14": { halfLife: 5730, unit: "years", decayChain: ["Nitrogen-14"] },
-  "Iodine-131": { halfLife: 8.02, unit: "days", decayChain: ["Xenon-131"] },
-  "Cobalt-60": { halfLife: 5.27, unit: "years", decayChain: ["Nickel-60"] },
-  "Cesium-137": { halfLife: 30.17, unit: "years", decayChain: ["Barium-137m"] },
-  "Barium-137m": { halfLife: 2.55, unit: "minutes", decayChain: ["Barium-137"] },
-  "Technetium-99m": { halfLife: 6.01, unit: "hours", decayChain: ["Technetium-99"] },
-  "Technetium-99": { halfLife: 2.11e5, unit: "years", decayChain: ["Ruthenium-99"] },
-  "Strontium-90": { halfLife: 28.8, unit: "years", decayChain: ["Yttrium-90"] },
-  "Yttrium-90": { halfLife: 64, unit: "hours", decayChain: ["Zirconium-90"] },
-  "Plutonium-239": { halfLife: 2.41e4, unit: "years", decayChain: ["Uranium-235"] },
-  "Iodine-129": { halfLife: 1.57e7, unit: "years", decayChain: ["Xenon-129"] },
-  "Tritium": { halfLife: 12.32, unit: "years", decayChain: ["Helium-3"] },
-  "Deuterium": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Helium-3": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Helium-4": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Neutron": { halfLife: 14.7, unit: "minutes", decayChain: ["Proton", "Electron", "Antineutrino"] },
-  "Proton": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Electron": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Antineutrino": { halfLife: Infinity, unit: "stable", decayChain: [] },
-  "Fluorine-18": { halfLife: 109.8, unit: "minutes", decayChain: ["Oxygen-18"] },
-  "Oxygen-18": { halfLife: Infinity, unit: "stable", decayChain: [] }
-};
+        function showSuggestions() {
+            const searchTerm = isotopeSearch.value.toLowerCase();
+            if (searchTerm.length < 1) { suggestions.classList.add('hidden'); return; }
+            suggestions.innerHTML = '';
+            const matches = Object.keys(isotopeDatabase).filter(iso => iso.toLowerCase().includes(searchTerm) || isotopeDatabase[iso].symbol.toLowerCase().includes(searchTerm));
+            if (matches.length === 0) { suggestions.classList.add('hidden'); return; }
+            matches.slice(0, 10).forEach(iso => {
+                const div = document.createElement('div');
+                div.className = 'p-3 hover:bg-blue-50 cursor-pointer flex justify-between items-center';
+                div.innerHTML = `<span class="font-medium">${iso} (${isotopeDatabase[iso].symbol})</span>`;
+                div.addEventListener('click', () => { isotopeSearch.value = iso; suggestions.classList.add('hidden'); });
+                suggestions.appendChild(div);
+            });
+            suggestions.classList.remove('hidden');
+        }
 
-// --- Helpers ---
-function convertToYears(value, unit) {
-  const conversion = {
-    seconds: 1 / (60 * 60 * 24 * 365),
-    minutes: 1 / (60 * 24 * 365),
-    hours: 1 / (24 * 365),
-    days: 1 / 365,
-    years: 1,
-    stable: Infinity
-  };
-  return value * (conversion[unit] || 1);
-}
+        function convertToSeconds(value, unit) {
+            switch (unit) {
+                case 'seconds': return value;
+                case 'minutes': return value * 60;
+                case 'hours': return value * 3600;
+                case 'days': return value * 86400;
+                case 'years': return value * 31557600;
+                default: return value;
+            }
+        }
 
-function formatHalfLife(value, unit) {
-  if (unit === "stable") return "Stable";
-  return `${value} ${unit}`;
-}
+        function convertFromSeconds(seconds, unit) {
+            switch (unit) {
+                case 'seconds': return seconds;
+                case 'minutes': return seconds / 60;
+                case 'hours': return seconds / 3600;
+                case 'days': return seconds / 86400;
+                case 'years': return seconds / 31557600;
+                default: return seconds;
+            }
+        }
 
-// --- Search Suggestions ---
-const searchInput = document.getElementById("isotope-search");
-const suggestionsBox = document.getElementById("suggestions");
+        function formatHalfLife(halfLife) {
+            if (halfLife === Infinity) return "Stable";
+            if (halfLife >= 1e9) return (halfLife / 1e9).toFixed(3) + " billion years";
+            if (halfLife >= 1e6) return (halfLife / 1e6).toFixed(3) + " million years";
+            if (halfLife >= 1000) return (halfLife / 1000).toFixed(3) + " thousand years";
+            if (halfLife >= 1) return halfLife.toFixed(3) + " years";
+            if (halfLife >= 1 / 365.25) return (halfLife * 365.25).toFixed(3) + " days";
+            if (halfLife >= 1 / (365.25 * 24)) return (halfLife * 365.25 * 24).toFixed(3) + " hours";
+            if (halfLife >= 1 / (365.25 * 24 * 60)) return (halfLife * 365.25 * 24 * 60).toFixed(3) + " minutes";
+            return (halfLife * 365.25 * 24 * 60 * 60).toFixed(3) + " seconds";
+        }
 
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.toLowerCase();
-  suggestionsBox.innerHTML = "";
-  if (!query) {
-    suggestionsBox.classList.add("hidden");
-    return;
-  }
+        function calculateDecay() {
+            const isotopeName = isotopeSearch.value;
+            if (!isotopeDatabase[isotopeName]) { alert("Please select a valid isotope from the suggestions"); return; }
 
-  const matches = Object.keys(isotopeDatabase).filter(key =>
-    key.toLowerCase().includes(query)
-  );
-  if (matches.length === 0) {
-    suggestionsBox.classList.add("hidden");
-    return;
-  }
+            const time = parseFloat(timeValue.value);
+            if (isNaN(time) || time < 0) { alert("Please enter a valid time value"); return; }
 
-  matches.forEach(match => {
-    const div = document.createElement("div");
-    div.textContent = match;
-    div.className = "px-4 py-2 hover:bg-gray-700 cursor-pointer";
-    div.addEventListener("click", () => {
-      searchInput.value = match;
-      suggestionsBox.classList.add("hidden");
-    });
-    suggestionsBox.appendChild(div);
-  });
+            const nuclei = initialNuclei.value ? parseInt(initialNuclei.value) : 1;
+            if (isNaN(nuclei) || nuclei < 1) { alert("Please enter a valid number of initial nuclei"); return; }
 
-  suggestionsBox.classList.remove("hidden");
-});
+            let timeInSeconds = convertToSeconds(time, timeUnit.value);
+            const isotope = isotopeDatabase[isotopeName];
+            const halfLifeInSeconds = convertToSeconds(isotope.halfLife, 'years');
 
-// --- Calculate Decay ---
-document.getElementById("calculate-btn").addEventListener("click", () => {
-  const isotopeName = searchInput.value.trim();
-  if (!isotopeDatabase[isotopeName]) {
-    alert("Please select a valid isotope from the list.");
-    return;
-  }
+            const decayConst = Math.log(2) / halfLifeInSeconds;
+            const prob = 1 - Math.exp(-decayConst * timeInSeconds);
+            const remaining = nuclei * Math.exp(-decayConst * timeInSeconds);
 
-  const isotope = isotopeDatabase[isotopeName];
-  const timeValue = parseFloat(document.getElementById("time-value").value) || 0;
-  const timeUnit = document.getElementById("time-unit").value;
-  const initialNuclei = parseInt(document.getElementById("initial-nuclei").value) || 1;
+            decayProbability.textContent = (prob * 100).toFixed(6) + '%';
+            remainingNuclei.textContent = remaining.toFixed(6);
 
-  const timeInYears = convertToYears(timeValue, timeUnit);
-  const halfLifeInYears = convertToYears(isotope.halfLife, isotope.unit);
+            displayDecayChain(isotopeName, 1.0);
 
-  let decayProbability = 0;
-  let remainingNuclei = initialNuclei;
+            addInterpretation(isotopeName, prob, remaining, nuclei, time, timeUnit.value);
 
-  if (isotope.unit !== "stable") {
-    const decayConstant = Math.log(2) / halfLifeInYears;
-    decayProbability = 1 - Math.exp(-decayConstant * timeInYears);
-    remainingNuclei = initialNuclei * Math.exp(-decayConstant * timeInYears);
-  }
+            resultsSection.classList.remove('hidden');
+            const resultCards = document.querySelectorAll('.fade-in');
+            resultCards.forEach((card, index) => { card.style.animationDelay = `${index * 0.1}s`; });
+        }
 
-  document.getElementById("decay-probability").textContent =
-    (decayProbability * 100).toFixed(2) + "%";
-  document.getElementById("remaining-nuclei").textContent =
-    remainingNuclei.toFixed(2);
+        function displayDecayChain(isotopeName, cumulativeProbability, depth = 0, parentContainer = null) {
+            const isotope = isotopeDatabase[isotopeName];
+            if (!isotope) return;
+            if (depth === 0) { decayChain.innerHTML = ''; parentContainer = decayChain; }
 
-  const chainDiv = document.getElementById("decay-chain");
-  chainDiv.innerHTML = "";
-  isotope.decayChain.forEach((step, i) => {
-    const div = document.createElement("div");
-    div.className = "decay-chain-item p-3 rounded-lg bg-gray-700 border border-gray-600";
-    div.innerHTML = `<strong class="text-green-300">Step ${i + 1}:</strong> ${step}`;
-    chainDiv.appendChild(div);
-  });
+            const element = document.createElement('div');
+            element.className = 'decay-chain-item bg-white border rounded-lg p-4 shadow-sm mb-2';
+            element.style.marginLeft = `${depth * 20}px`;
+            element.innerHTML = `<div class="flex justify-between items-center">
+    <div><span class="font-bold">${isotopeName} (${isotope.symbol})</span><span class="text-sm text-gray-500 ml-2">${formatHalfLife(isotope.halfLife)}</span></div>
+    ${depth > 0 ? `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">${(cumulativeProbability * 100).toFixed(4)}%</span>` : ''}
+  </div>`;
+            parentContainer.appendChild(element);
 
-  const interpretation = `For ${isotopeName} with half-life ${formatHalfLife(
-    isotope.halfLife,
-    isotope.unit
-  )}, after ${timeValue} ${timeUnit}, about ${(
-    decayProbability * 100
-  ).toFixed(2)}% of nuclei have decayed.`;
-  document.getElementById("interpretation").textContent = interpretation;
+            if (!isotope.decays || isotope.decays.length === 0 || isotope.halfLife === Infinity) return;
 
-  document.getElementById("results-section").classList.remove("hidden");
-});
+            isotope.decays.forEach(decay => {
+                displayDecayChain(decay.product, cumulativeProbability * decay.branchingRatio, depth + 1, parentContainer);
+            });
+        }
 
-feather.replace();
+        function addInterpretation(isotopeName, prob, remaining, initialNuclei, time, timeUnit) {
+            const isotope = isotopeDatabase[isotopeName];
+            let interpretationText = `For ${isotopeName} (${isotope.symbol}) over ${time} ${timeUnit}:<br><br>`;
+            interpretationText += `• Each nucleus has a ${(prob * 100).toFixed(2)}% chance of decaying.<br>`;
+            interpretationText += `• Starting with ${initialNuclei} nuclei, you'd expect about ${remaining.toFixed(2)} to remain.<br><br>`;
+            const halfLifeInInputUnits = convertFromSeconds(convertToSeconds(isotope.halfLife, 'years'), timeUnit);
+            interpretationText += `The half-life of ${isotopeName} is ${halfLifeInInputUnits.toExponential(3)} ${timeUnit}. `;
+            interpretation.innerHTML = interpretationText;
+        }
+
+        feather.replace();
