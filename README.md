@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decay Chains</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .decay-chain-item {
+            transition: all 0.3s ease;
+        }
+
+        .decay-chain-item:hover {
+            transform: scale(1.02);
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div id="vanta-bg" class="fixed inset-0 z-0"></div>
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Decay Chains</h1>
+            <p class="text-lg text-gray-600">Calculate radioactive decay probabilities and visualize decay chains</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-xl p-6 mb-8 backdrop-blur-sm bg-opacity-90">
+            <div class="mb-6">
+                <label for="isotope-search" class="block text-lg font-medium text-gray-700 mb-2">Select Radioactive
+                    Isotope</label>
+                <div class="relative">
+                    <input type="text" id="isotope-search"
+                        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="e.g. Uranium-238, Carbon-14, Iodine-131">
+                    <div id="suggestions"
+                        class="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="time-value" class="block text-lg font-medium text-gray-700 mb-2">Time Interval</label>
+                    <div class="flex">
+                        <input type="number" id="time-value"
+                            class="flex-1 p-4 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Enter time" min="0" step="0.01">
+                        <select id="time-unit"
+                            class="p-4 border-t border-r border-b border-gray-300 rounded-r-lg bg-gray-50 focus:ring-2 focus:ring-blue-500">
+                            <option value="seconds">seconds</option>
+                            <option value="minutes">minutes</option>
+                            <option value="hours">hours</option>
+                            <option value="days">days</option>
+                            <option value="years" selected>years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="initial-nuclei" class="block text-lg font-medium text-gray-700 mb-2">Initial Nuclei
+                        (optional)</label>
+                    <input type="number" id="initial-nuclei"
+                        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Default: 1" min="1" value="1">
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="calculate-btn"
+                    class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all duration-300 transform hover:scale-105">
+                    Calculate Decay
+                </button>
+            </div>
+        </div>
+
+        <div id="results-section" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 fade-in">
+                    <div class="flex items-center mb-4">
+                        <i data-feather="activity" class="text-blue-600 mr-3"></i>
+                        <h3 class="text-xl font-semibold text-blue-800">Decay Probability</h3>
+                    </div>
+                    <div class="text-3xl font-bold text-blue-900 mb-2" id="decay-probability">0%</div>
+                    <p class="text-gray-600">Chance that a nucleus decays in the given time</p>
+                </div>
+
+                <div class="bg-green-50 border border-green-200 rounded-xl p-6 fade-in">
+                    <div class="flex items-center mb-4">
+                        <i data-feather="layers" class="text-green-600 mr-3"></i>
+                        <h3 class="text-xl font-semibold text-green-800">Remaining Nuclei</h3>
+                    </div>
+                    <div class="text-3xl font-bold text-green-900 mb-2" id="remaining-nuclei">0</div>
+                    <p class="text-gray-600">Expected number of nuclei remaining</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-xl p-6 backdrop-blur-sm bg-opacity-90 mb-8">
+                <div class="flex items-center mb-6">
+                    <i data-feather="git-commit" class="text-purple-600 mr-3"></i>
+                    <h2 class="text-2xl font-bold text-gray-800">Decay Chain</h2>
+                </div>
+                <div id="decay-chain" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 fade-in">
+                <div class="flex items-center mb-4">
+                    <i data-feather="info" class="text-yellow-600 mr-3"></i>
+                    <h3 class="text-xl font-semibold text-yellow-800">Interpretation</h3>
+                </div>
+                <p class="text-gray-700" id="interpretation"></p>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+          <p>Decay calculator for educational purposes</p>
+          <p class="mt-1">
+            Data acquired from 
+            <a href="https://www.nndc.bnl.gov/" 
+          class="text-blue-500 hover:underline" 
+          target="_blank" 
+          rel="noopener noreferrer">
+          nndc.gov
+          </a>
+          </p>
+          </footer>
+
+    </div>
+
+    <script src="index.js"></script>
+
+    
+</body>
+
+</html>
+
+
+
